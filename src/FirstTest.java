@@ -34,11 +34,13 @@ public class FirstTest {
         capabilities.setCapability("app", "C:\\WSOTeam\\JavaAppiumAutomation\\apks\\wiki.apk");
 
         driver = new AndroidDriver(new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+        driver.rotate(ScreenOrientation.PORTRAIT);
     }
     @After
     public void tearDown(){
         driver.quit();
     }
+
     @Test
     public void firstTest(){
         waitForElementAndClick(
@@ -653,6 +655,40 @@ public class FirstTest {
 
     }
 
+    @Test
+    public void assertElementPresent(){
+        String searchLine = "Sahara desert ant";
+        String locator = "//*[@resource-id='org.wikipedia:id/search_results_list']" +
+                "//*[@text='Sahara Desert ant']";
+        waitForElementAndClick(
+                By.id("org.wikipedia:id/search_container"),
+                "Cannot find search container",
+                5
+        );
+        waitForElementAndSendKeys(
+                By.xpath("//*[contains(@text, 'Search…')]"),
+                searchLine,
+                "Cannot find search input " + searchLine,
+                5
+        );
+        String title = waitForElementAndGetAttribute(
+                By.xpath(locator),
+                "text",
+                "Cannot find locator by search text " + searchLine,
+                15
+        );
+        Assert.assertEquals(
+                "SMTH goes wrong",
+                searchLine.toLowerCase(),
+                title.toLowerCase()
+        );
+        waitForElementAndClick(
+                By.xpath(locator),
+                "Cannot find search article " + searchLine,
+                15
+            );
+
+    }
 
     private WebElement waitForElementPresent(By by, String error_message, long timeoutInSec){
         WebDriverWait wait = new WebDriverWait(driver, timeoutInSec);
